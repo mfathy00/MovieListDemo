@@ -1,0 +1,70 @@
+﻿@model PagedList.IPagedList<MovieListDemo.Models.Movie>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css"
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @using (Html.BeginForm())
+    {
+        <p>
+            Find by title: @Html.TextBox("title")
+            <input type="submit" value="Search" />
+        </p>
+    }
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Poster </th>
+            <th>Title </th>
+            <th>Summary </th>
+            <th>Trailers </th>
+            <th>Share </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src= "@Url.Content(item.Poster)" alt="Poster" width="80" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Summary)
+                </td>
+                <td>
+                    <embed width="200" height="200" src="@Url.Content(item.URL)">
+                </td>
+                <td>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=@Url.Encode(Request.Url.ToString())&t=@Url.Encode(item.URL)" target="_blank">
+                        <img src="~/Images/1460384781_facebook.png">
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=@Url.Encode(Request.Url.ToString())&text=@Url.Encode(item.URL)" target="_blank" title="Tweet">
+                        <img src="~/Images/1460384774_twitter.png">
+                    </a>
+                    <a href="https://plus.google.com/share?url=@Url.Encode(Request.Url.ToString())" target="_blank" title="Share on Google+">
+                        <img src="~/Images/1460384789_google.png">
+                    </a>
+                </td>
+            </tr>
+        }
+
+    </table>
+    <br />
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", 
+    new { page}))
+</body>
+</html>
