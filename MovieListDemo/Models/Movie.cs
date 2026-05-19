@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using TMDbLib.Client;
 using TMDbLib.Objects.Movies;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
-using System.Data.Entity;
-
 
 namespace MovieListDemo.Models
 {
@@ -20,22 +19,19 @@ namespace MovieListDemo.Models
         public string Poster { get; set; }
         public string Summary { get; set; }
         public string Language { get; set; }
-        
+
         public static List<Models.Movie> SearchMovie(string title)
         {
             try
             {
-                SearchContainer<SearchMovie> results = APIConfiguration.ConnectAPI().SearchMovie("star wars");
+                TMDbClient client = APIConfiguration.ConnectAPI();
+                string searchTerm = String.IsNullOrEmpty(title) ? "star wars" : title;
+                SearchContainer<SearchMovie> results = client.SearchMovie(searchTerm);
                 List<Models.Movie> mlist = new List<Models.Movie>();
-
-                if (!String.IsNullOrEmpty(title))
-                {
-                    results = APIConfiguration.ConnectAPI().SearchMovie(title);
-                }
 
                 foreach (SearchMovie result in results.Results)
                 {
-                    TMDbLib.Objects.Movies.Movie trial = APIConfiguration.ConnectAPI().GetMovie(result.Id, MovieMethods.Videos);
+                    TMDbLib.Objects.Movies.Movie trial = client.GetMovie(result.Id, MovieMethods.Videos);
 
                     Models.Movie movie = new Models.Movie()
                     {
@@ -54,29 +50,7 @@ namespace MovieListDemo.Models
                 logger.Error(ex);
                 throw;
             }
-
         }
-        // That code apply in case we need to save result to Database 
-        //public static DbSet<Movie> SaveToDB(List<Models.Movie> movielist) 
-        //{
-        //    var db = new MovieListDemo.Models.MovieContext();
-
-        //    try
-        //    {
-        //        foreach (var item in movielist)
-        //        {
-        //            db.Movie.Add(item);
-        //            db.SaveChanges();
-        //        }
-        //        return db.Movie;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        logger.Error(ex);
-        //        throw;
-        //    }
- 
-        //}
     }
 
 }
